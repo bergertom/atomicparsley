@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -26,6 +26,8 @@
 
 #include "AtomicParsley.h"
 #include "CDtoc.h"
+
+#define DARWIN_PLATFORM
 
 #if defined (DARWIN_PLATFORM)
 #include <CoreFoundation/CoreFoundation.h>

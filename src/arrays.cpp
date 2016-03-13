@@ -22,7 +22,8 @@
     Code Contributions by:
 		
     * Mellow_Flow - fix genre matching/verify genre limits
-                                                                   */
+    * Fixed UTF-8 literals Bokm\u00E5l, Proven\u00E7al, Volap\u00FCk
+    */
 //==================================================================//
 
 #include "AtomicParsley.h"
@@ -268,7 +269,7 @@ iso639_lang known_languages[] = {
 	{ "grn",			"gn",			"Guarani" },
 	{ "gsw",			NULL,			"Alemanic; Swiss German" },
 	{ "guj",			"gu",			"Gujarati" },
-	{ "gwi",			NULL,			"Gwich´in" },
+	{ "gwi",			NULL,			"Gwich/u00B4in" },
 	{ "hai",			NULL,			"Haida" },
 	{ "hat",			"ht",			"Haitian; Haitian Creole" },
 	{ "hau",			"ha",			"Hausa" },
@@ -414,7 +415,7 @@ iso639_lang known_languages[] = {
 	{ "nic",			NULL,			"Niger-Kordofanian (Other)" },
 	{ "niu",			NULL,			"Niuean" },
 	{ "nno",			"nn",			"Norwegian Nynorsk; Nynorsk, Norwegian" },
-	{ "nob",			"nb",			"Norwegian Bokmål; Bokmål, Norwegian" },
+	{ "nob",			"nb",			"Norwegian Bokm\u00E5l; Bokm\u00E5l, Norwegian" },
 	{ "nog",			NULL,			"Nogai" },
 	{ "non",			NULL,			"Norse, Old" },
 	{ "nor",			"no",			"Norwegian" },
@@ -427,7 +428,7 @@ iso639_lang known_languages[] = {
 	{ "nyn",			NULL,			"Nyankole" },
 	{ "nyo",			NULL,			"Nyoro" },
 	{ "nzi",			NULL,			"Nzima" },
-	{ "oci",			"oc",			"Occitan (post 1500); Provençal" },
+	{ "oci",			"oc",			"Occitan (post 1500); Proven\u00E7al" },
 	{ "oji",			"oj",			"Ojibwa" },
 	{ "ori",			"or",			"Oriya" },
 	{ "orm",			"om",			"Oromo" },
@@ -451,7 +452,7 @@ iso639_lang known_languages[] = {
 	{ "pon",			NULL,			"Pohnpeian" },
 	{ "por",			"pt",			"Portuguese" },
 	{ "pra",			NULL,			"Prakrit languages" },
-	{ "pro",			NULL,			"Provençal, Old (to 1500)" },
+	{ "pro",			NULL,			"Proven\u00E7al, Old (to 1500)" },
 	{ "pus",			"ps",			"Pushto" },
 	//{ "qaa-qtz",	NULL,			"Reserved for local use" },
 	{ "que",			"qu",			"Quechua" },
@@ -561,7 +562,7 @@ iso639_lang known_languages[] = {
 	{ "vai",			NULL,			"Vai" },
 	{ "ven",			"ve",			"Venda" },
 	{ "vie",			"vi",			"Vietnamese" },
-	{ "vol",			"vo",			"Volapük" },
+	{ "vol",			"vo",			"Volap\u00FCk" },
 	{ "vot",			NULL,			"Votic" },
 	{ "wak",			NULL,			"Wakashan languages" },
 	{ "wal",			NULL,			"Walamo" },

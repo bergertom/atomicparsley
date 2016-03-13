@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2005-2007 puck_lock
+    Copyright (c)2005-2007 puck_lock
     with contributions from others; see the CREDITS file
 
     ----------------------
@@ -24,6 +24,7 @@
     * Mike Brancato - Debian patches & build support
     * Lowell Stewart - null-termination bugfix for Apple compliance
 		* Brian Story - native Win32 patches; memset/framing/leaks fixes
+	* Thomas Berger - replaced (c) symbol "ï¿½" with \u00A8
                                                                    */
 //==================================================================//
 
@@ -2040,8 +2041,8 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 
 	if (unicode_data != NULL) {
 		if (text_tag_style == UTF16_3GP_Style) {
-			uint32_t string_length = strlen(unicode_data) + 1;
-			uint32_t glyphs_req_bytes = mbstowcs(NULL, unicode_data, string_length) * 2; //passing NULL pre-calculates the size of wchar_t needed;
+			uint32_t string_length = (uint32_t)strlen(unicode_data) + 1;
+			uint32_t glyphs_req_bytes = (uint32_t)mbstowcs(NULL, unicode_data, string_length) * 2; //passing NULL pre-calculates the size of wchar_t needed;
 
 			unsigned char* utf16_conversion = (unsigned char*)calloc(1, sizeof(unsigned char)* string_length * 2 );
 
@@ -2064,7 +2065,7 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 			free(utf16_conversion); utf16_conversion = NULL;
 
 		} else if (text_tag_style == UTF8_iTunesStyle_Binary) { //because this will be 'binary' data (a misnomer for purl & egid), memcpy 4 bytes into AtomicData, not at the start of it
-			uint32_t binary_bytes = strlen(unicode_data);
+			uint32_t binary_bytes = (uint32_t)strlen(unicode_data);
 			memcpy(target_atom->AtomicData + atom_data_pos, unicode_data, binary_bytes + 1 );
 			target_atom->AtomicLength += binary_bytes;
 
@@ -2072,12 +2073,12 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 			uint32_t total_bytes = 0;
 
 			if (text_tag_style == UTF8_3GP_Style) {
-				total_bytes = strlen(unicode_data);
+				total_bytes = (uint32_t)strlen(unicode_data);
 				total_bytes++;  //include the terminating NULL
 
 			} else if (text_tag_style == UTF8_iTunesStyle_256glyphLimited) {
 
-				uint32_t raw_bytes = strlen(unicode_data);
+				uint32_t raw_bytes = (uint32_t)strlen(unicode_data);
 				total_bytes = utf8_length(unicode_data, 256); //counts the number of characters, not bytes
 
 				if (raw_bytes > total_bytes && total_bytes > 255) {
@@ -2090,7 +2091,7 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 				}
 
 			} else if (text_tag_style == UTF8_iTunesStyle_Unlimited) {
-				total_bytes = strlen(unicode_data);
+				total_bytes = (uint32_t)strlen(unicode_data);
 
 				if (total_bytes > MAXDATA_PAYLOAD) {
 					free(target_atom->AtomicData);
@@ -2172,7 +2173,7 @@ APar_MetaData_atomGenre_Set
 	atomPayload - the desired string value of the genre
 
     genre is special in that it gets carried on 2 atoms. A standard genre (as listed in ID3v1GenreList) is represented as a number on a 'gnre' atom
-		any value other than those, and the genre is placed as a string onto a '©gen' atom. Only one or the other can be present. So if atomPayload is a
+		any value other than those, and the genre is placed as a string onto a '(c)gen' atom. Only one or the other can be present. So if atomPayload is a
 		non-NULL value, first try and match the genre into the ID3v1GenreList standard genres. Try to remove the other type of genre atom, then find or
 		create the new genre atom and put the data manually onto the atom.
 ----------------------*/
@@ -2180,8 +2181,8 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 	if (metadata_style == ITUNES_STYLE) {
 		const char* standard_genre_atom = "moov.udta.meta.ilst.gnre";
 		const char* std_genre_data_atom = "moov.udta.meta.ilst.gnre.data";
-		const char* custom_genre_atom = "moov.udta.meta.ilst.©gen";
-		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.©gen.data";
+		const char* custom_genre_atom = "moov.udta.meta.ilst.\u00A8gen";
+		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.\u00A8gen.data";
 
 		if ( strlen(atomPayload) == 0) {
 			APar_RemoveAtom(std_genre_data_atom, VERSIONED_ATOM, 0); //find the atom; don't create if it's "" to remove
@@ -2195,13 +2196,13 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 			modified_atoms = true;
 
 			if (genre_number != 0) {
-				//first find if a custom genre atom ("©gen") exists; erase the custom-string genre atom in favor of the standard genre atom
+				//first find if a custom genre atom ("\u00A8gen") exists; erase the custom-string genre atom in favor of the standard genre atom
 
 				AtomicInfo* verboten_genre_atom = APar_FindAtom(custom_genre_atom, false, SIMPLE_ATOM, 0);
 
 				if (verboten_genre_atom != NULL) {
 					if (strlen(verboten_genre_atom->AtomicName) > 0) {
-						if (strncmp(verboten_genre_atom->AtomicName, "©gen", 4) == 0) {
+						if (strncmp(verboten_genre_atom->AtomicName, "\u00A8gen", 4) == 0) {
 							APar_RemoveAtom(cstm_genre_data_atom, VERSIONED_ATOM, 0);
 						}
 					}
@@ -2249,7 +2250,7 @@ void APar_MetaData_atomArtwork_Init(short atom_num, const char* artworkPath) {
 	if (picture_size > 0) {
 		APar_MetaData_atom_QuickInit(atom_num, APar_TestArtworkBinaryData(artworkPath), 0, picture_size );
 		FILE* artfile = APar_OpenFile(artworkPath, "rb");
-		uint32_t bytes_read = APar_ReadFile(parsedAtoms[atom_num].AtomicData + 4, artfile, picture_size); //+4 for the 4 null bytes
+		uint64_t bytes_read = APar_ReadFile(parsedAtoms[atom_num].AtomicData + 4, artfile, picture_size); //+4 for the 4 null bytes
 		if (bytes_read > 0) parsedAtoms[atom_num].AtomicLength += bytes_read;
 		fclose(artfile);
 	}
@@ -2465,7 +2466,7 @@ APar_MetaData_atom_QuickInit
 
     Metadata_QuickInit will initialize a pre-found atom to MAXDATA_PAYLOAD so that it can carry info on AtomicData
 ----------------------*/
-void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags, uint32_t supplemental_length, uint32_t allotment) {
+void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags, uint64_t supplemental_length, uint64_t allotment) {
 	//this will skip the finding of atoms and just malloc the AtomicData; used by genre & artwork
 
 	parsedAtoms[atom_num].AtomicData = (char*)calloc(1, sizeof(char)* allotment+50 );

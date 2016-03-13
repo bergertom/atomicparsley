@@ -18,8 +18,10 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2005-2007 puck_lock
+    Copyright (c) 2005-2007 puck_lock
     with contributions from others; see the CREDITS file
+ 
+    changed APar_MetaData_atom_QuickInit to (uint64_t supplemental_length, uint64_t allotment)
                                                                    */
 //==================================================================//
 
@@ -211,7 +213,7 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath,
 
 void APar_MetaData_atomGenre_Set(const char* atomPayload);
 void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags,
-  uint32_t supplemental_length, uint32_t allotment = MAXDATA_PAYLOAD + 1);
+  uint64_t supplemental_length, uint64_t allotment = MAXDATA_PAYLOAD + 1);
 
 AtomicInfo* APar_MetaData_atom_Init(const char* atom_path,
   const char* MD_Payload, const uint32_t atomFlags);
