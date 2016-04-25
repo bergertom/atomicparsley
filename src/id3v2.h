@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -53,7 +53,7 @@ int FrameStr_TO_FrameType(const char* frame_str);
 void APar_ID32_ScanID3Tag(FILE* source_file, AtomicInfo* id32_atom);
 
 uint32_t APar_GetTagSize(AtomicInfo* id32_atom);
-uint32_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint32_t max_alloc);
+uint64_t APar_Render_ID32_Tag(AtomicInfo* id32_atom, uint64_t max_alloc);
 
 char* APar_ConvertField_to_UTF8(ID3v2Frame* targetframe, int fieldtype);
 

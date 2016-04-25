@@ -267,7 +267,7 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 	  left_over -= 64;
 	  memcpy (ctx->buffer, &ctx->buffer[64], left_over);
 	}
-      ctx->buflen = left_over;
+      ctx->buflen = (md5_uint32)left_over;
     }
 }
 

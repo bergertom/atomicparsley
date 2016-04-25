@@ -204,7 +204,7 @@ static int xmlLittleEndian =
  *     if the return value is positive, else unpredictable.
  * The value of @outlen after return is the number of octets consumed.
  */
-int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int inlen) {
+size_t isolat1ToUTF8(unsigned char* out, size_t outlen, const unsigned char* in, size_t inlen) {
     unsigned char* outstart = out;
     const unsigned char* base = in;
     unsigned char* outend;
@@ -253,13 +253,13 @@ int isolat1ToUTF8(unsigned char* out, int outlen, const unsigned char* in, int i
  *     if the return value is positive, else unpredictable.
  * The value of @outlen after return is the number of octets consumed.
  */
-int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int inlen) {
+size_t UTF8Toisolat1(unsigned char* out, size_t outlen, const unsigned char* in, size_t inlen) {
     const unsigned char* processed = in;
     const unsigned char* outend;
     const unsigned char* outstart = out;
     const unsigned char* instart = in;
     const unsigned char* inend;
-    unsigned int c, d;
+    int c, d;
     int trailing;
 
     if ((out == NULL) || (outlen == 0) || (inlen == 0)) return(-1);
@@ -278,16 +278,16 @@ int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int i
 	if      (d < 0x80)  { c= d; trailing= 0; }
 	else if (d < 0xC0) {
 	    /* trailing byte in leading position */
-	    outlen = out - outstart;
-	    inlen = processed - instart;
+	    outlen = (int)(out - outstart);
+	    inlen = (int)(processed - instart);
 	    return(-2);
         } else if (d < 0xE0)  { c= d & 0x1F; trailing= 1; }
         else if (d < 0xF0)  { c= d & 0x0F; trailing= 2; }
         else if (d < 0xF8)  { c= d & 0x07; trailing= 3; }
 	else {
 	    /* no chance for this in IsoLat1 */
-	    outlen = out - outstart;
-	    inlen = processed - instart;
+	    outlen = (int)(out - outstart);
+	    inlen = (int)(processed - instart);
 	    return(-2);
 	}
 
@@ -299,8 +299,8 @@ int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int i
 	    if (in >= inend)
 		break;
 	    if (((d= *in++) & 0xC0) != 0x80) {
-		outlen = out - outstart;
-		inlen = processed - instart;
+		outlen = (int)(out - outstart);
+		inlen = (int)(processed - instart);
 		return(-2);
 	    }
 	    c <<= 6;
@@ -314,14 +314,14 @@ int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int i
 	    *out++ = c;
 	} else {
 	    /* no chance for this in IsoLat1 */
-	    outlen = out - outstart;
-	    inlen = processed - instart;
+	    outlen = (int)(out - outstart);
+	    inlen = (int)(processed - instart);
 	    return(-2);
 	}
 	processed = in;
     }
-    outlen = out - outstart;
-    inlen = processed - instart;
+    outlen = (int)(out - outstart);
+    inlen = (int)(processed - instart);
     return(outlen);
 }
 
@@ -342,14 +342,14 @@ int UTF8Toisolat1(unsigned char* out, int outlen, const unsigned char* in, int i
  * The value of *inlen after return is the number of octets consumed
  *     if the return value is positive, else unpredictable.
  */
-int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb)
+size_t UTF16BEToUTF8(unsigned char* out, size_t outlen, const unsigned char* inb, size_t inlenb)
 {
     unsigned char* outstart = out;
     const unsigned char* processed = inb;
     unsigned char* outend = out + outlen;
     unsigned short* in = (unsigned short*) inb;
     unsigned short* inend;
-    unsigned int c, d, inlen;
+    uint64_t c, d, inlen;
     unsigned char *tmp;
     int bits;
 
@@ -373,8 +373,8 @@ int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int 
 	} 
         if ((c & 0xFC00) == 0xD800) {    /* surrogates */
 	    if (in >= inend) {           /* (in > inend) shouldn't happens */
-		outlen = out - outstart;
-		inlenb = processed - inb;
+		outlen = (int)(out - outstart);
+		inlenb = (int)(processed - inb);
 	        return(-2);
 	    }
 	    if (xmlLittleEndian) {
@@ -393,8 +393,8 @@ int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int 
                 c += 0x10000;
             }
             else {
-		outlen = out - outstart;
-		inlenb = processed - inb;
+		outlen = (int)(out - outstart);
+		inlenb = (int)(processed - inb);
 	        return(-2);
 	    }
         }
@@ -414,8 +414,8 @@ int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int 
         }
 	processed = (const unsigned char*) in;
     }
-    outlen = out - outstart;
-    inlenb = processed - inb;
+    outlen = (int)(out - outstart);
+    inlenb = (int)(processed - inb);
     return(outlen);
 }
 	 
@@ -432,7 +432,7 @@ int UTF16BEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int 
  * Returns the number of byte written, or -1 by lack of space, or -2
  *     if the transcoding failed. 
  */
-int UTF8ToUTF16BE(unsigned char* outb, int outlen, const unsigned char* in, int inlen)
+size_t UTF8ToUTF16BE(unsigned char* outb, size_t outlen, const unsigned char* in, size_t inlen)
 {
     unsigned short* out = (unsigned short*) outb;
     const unsigned char* processed = in;
@@ -440,7 +440,7 @@ int UTF8ToUTF16BE(unsigned char* outb, int outlen, const unsigned char* in, int 
     unsigned short* outstart= out;
     unsigned short* outend;
     const unsigned char* inend= in+inlen;
-    unsigned int c, d;
+    uint64_t c, d;
     int trailing;
     unsigned char *tmp;
     unsigned short tmp1, tmp2;
@@ -539,14 +539,14 @@ int UTF8ToUTF16BE(unsigned char* outb, int outlen, const unsigned char* in, int 
  *     The value of *inlen after return is the number of octets consumed
  *     if the return value is positive, else unpredictable.
  */
-int UTF16LEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int inlenb)
+size_t UTF16LEToUTF8(unsigned char* out, size_t outlen, const unsigned char* inb, size_t inlenb)
 {
     unsigned char* outstart = out;
     const unsigned char* processed = inb;
     unsigned char* outend = out + outlen;
     unsigned short* in = (unsigned short*) inb;
     unsigned short* inend;
-    unsigned int c, d, inlen;
+    uint64_t c, d, inlen;
     unsigned char *tmp;
     int bits;
 
@@ -621,7 +621,7 @@ int UTF16LEToUTF8(unsigned char* out, int outlen, const unsigned char* inb, int 
  * Returns the number of bytes written, or -1 if lack of space, or -2
  *     if the transcoding failed. 
  */
-int UTF8ToUTF16LE(unsigned char* outb, int outlen, const unsigned char* in, int inlen)
+size_t UTF8ToUTF16LE(unsigned char* outb, size_t outlen, const unsigned char* in, size_t inlen)
 {
     unsigned short* out = (unsigned short*) outb;
     const unsigned char* processed = in;
@@ -629,7 +629,7 @@ int UTF8ToUTF16LE(unsigned char* outb, int outlen, const unsigned char* in, int 
     unsigned short* outstart= out;
     unsigned short* outend;
     const unsigned char* inend= in+inlen;
-    unsigned int c, d;
+    size_t c, d;
     int trailing;
     unsigned char *tmp;
     unsigned short tmp1, tmp2;
@@ -718,7 +718,7 @@ int isUTF8(const char* in_string) {
 	//fprintf(stdout, "utf8 test-> %s\n", in_string);
 	int str_bytes = 0;
 	if (in_string != NULL ) {
-		str_bytes = strlen(in_string);
+		str_bytes = (int)strlen(in_string);
 	} else {
 		return -1;
 	}
@@ -784,10 +784,10 @@ utf8_length
 		char_limit is not zero (the char_limit will equal utf_string_leghth because of the break), so change gears, save space and just return the byte_count.
 ----------------------*/
 #include <stdio.h>
-unsigned int utf8_length(const char *in_string, unsigned int char_limit) {
+size_t utf8_length(const char *in_string, size_t char_limit) {
 	const char *utf8_str = in_string;
 	unsigned int utf8_string_length = 0;
-	unsigned int in_str_len = strlen(in_string);
+	unsigned int in_str_len = (int)strlen(in_string);
 	unsigned int byte_count = 0;
 	unsigned int bytes_in_char = 0;
 
@@ -907,7 +907,7 @@ int test_conforming_alpha_string(char* in_string) {
 	int string_len = 0;
 	char* test_str = in_string;
 	if (in_string != NULL ) {
-		string_len = strlen(in_string);
+		string_len = (int)strlen(in_string);
 	} else {
 		return -1;
 	}

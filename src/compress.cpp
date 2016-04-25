@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -44,8 +44,7 @@ APar_zlib_inflate
 
     fill
 ----------------------*/
-void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
-	char* out_buffer, uint32_t out_buf_len)
+void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len)
 {
 #if defined HAVE_ZLIB_H
 	z_stream zlib;
@@ -68,10 +67,10 @@ void APar_zlib_inflate(char* in_buffer, uint32_t in_buf_len,
 	return ;
 }
 
-uint32_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len,
-	char* out_buffer, uint32_t out_buf_len)
+// NOTE: zlib is only 32 bit !!!
+uint64_t APar_zlib_deflate(char* in_buffer, uint32_t in_buf_len, char* out_buffer, uint32_t out_buf_len)
 {
-	uint32_t compressed_bytes = 0;
+	uint64_t compressed_bytes = 0;
 
 #if defined HAVE_ZLIB_H
 	z_stream zlib;

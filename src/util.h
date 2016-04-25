@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 																																		*/
 //==================================================================//
@@ -55,10 +55,10 @@ uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos);
 uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos);
 uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos);
 uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos);
-void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint32_t length);
-void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t length);
-uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to_read);
-uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number);
+void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint64_t length);
+void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint64_t length);
+uint64_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint64_t bytes_to_read);
+uint64_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number);
 
 void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language);
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset);
@@ -78,8 +78,8 @@ void APar_StandardTime(char* &formed_time);
 wchar_t* Convert_multibyteUTF16_to_wchar(char* input_unicode, size_t glyph_length, bool skip_BOM);
 unsigned char* Convert_multibyteUTF16_to_UTF8(char* input_utf8, size_t glyph_length, size_t byte_count);
 wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8);
-uint32_t findstringNULLterm(char* in_string, uint8_t encodingFlag, uint32_t max_len);
-uint32_t skipNULLterm(char* in_string, uint8_t encodingFlag, uint32_t max_len);
+uint64_t findstringNULLterm(char* in_string, uint8_t encodingFlag, uint64_t max_len);
+uint64_t skipNULLterm(char* in_string, uint8_t encodingFlag, uint64_t max_len);
 
 
 uint16_t UInt16FromBigEndian(const char *string);
@@ -92,8 +92,8 @@ void UInt64_TO_String8(uint64_t ullnum, char* data);
 uint32_t float_to_16x16bit_fixed_point(double floating_val);
 double fixed_point_16x16bit_to_double(uint32_t fixed_point);
 
-uint32_t widechar_len(char* instring, uint32_t _bytes_);
+uint64_t widechar_len(char* instring, uint64_t _bytes_);
 
 bool APar_assert(bool expression, int error_msg, const char* supplemental_info);
 
-unsigned long xor4096i();
+int64_t xor4096i();

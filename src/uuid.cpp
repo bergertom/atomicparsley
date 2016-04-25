@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -318,9 +318,9 @@ AP_Create_UUID_ver3_random
 		In 2.5 million creations, all have been unique (at least on Mac OS X with sranddev providing the initial seed).
 ----------------------*/
 void AP_Create_UUID_ver3_random(ap_uuid_t* out_uuid) {
-	uint32_t rand1 = 0;
+	int64_t rand1 = 0;
 
-	out_uuid->time_low = xor4096i();
+	out_uuid->time_low = (uint32_t)xor4096i();
 	rand1 = xor4096i();
 	out_uuid->time_mid = (rand1 >> 16) & 0xFFFF;
 	out_uuid->node[0] = (rand1 >> 8) & 0xFF;

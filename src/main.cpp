@@ -792,15 +792,15 @@ void ExtractPaddingPrefs(char* env_padding_prefs) {
 
 void GetBasePath(const char *filepath, char* &basepath) {
     //with a myriad of m4a, m4p, mp4, whatever else comes up... it might just be easiest to strip off the end.
-    int split_here = 0;
-    for (int i=strlen(filepath); i >= 0; i--) {
+    long split_here = 0;
+    for (long i=strlen(filepath); i >= 0; i--) {
         const char* this_char=&filepath[i];
         if ( *this_char == '.' ) {
             split_here = i;
             break;
         }
     }
-    memcpy(basepath, filepath, (size_t)split_here);
+    memcpy(basepath, filepath, split_here);
 
     return;
 }
@@ -1826,7 +1826,7 @@ int real_main(int argc, char *argv[])
         case Meta_uuid : {
             APar_ScanAtoms(ISObasemediafile);
             uint32_t uuid_dataType = 0;
-            uint32_t desc_len = 0;
+            size_t desc_len = 0;
             uint8_t mime_len = 0;
             char* uuid_file_path = NULL;
             char* uuid_file_description = NULL;
@@ -1911,7 +1911,7 @@ int real_main(int argc, char *argv[])
         //4 bytes - length of the attached binary data/file length
         //X bytes - binary data
 
-                uint32_t extn_len = strlen(uuid_file_extn)+1; //+1 for the trailing 1 byte NULL terminator
+                uint32_t extn_len = (uint32_t)strlen(uuid_file_extn) +1; //+1 for the trailing 1 byte NULL terminator
                 uint64_t file_len = findFileSize(uuid_file_path);
 
                 APar_MetaData_atom_QuickInit(genericUUID->AtomicNumber, uuid_dataType, 20, extn_len + desc_len + file_len + 100);
@@ -1934,7 +1934,7 @@ int real_main(int argc, char *argv[])
                 FILE* uuid_binfile = APar_OpenFile(uuid_file_path, "rb");
                 APar_Unified_atom_Put(genericUUID, NULL, UTF8_3GP_Style, file_len, 32);
                 //store the data directly on the atom in AtomicData
-                uint32_t bin_bytes_read = APar_ReadFile(genericUUID->AtomicData + (genericUUID->AtomicLength - 32), uuid_binfile, file_len);
+                uint32_t bin_bytes_read = (uint32_t)APar_ReadFile(genericUUID->AtomicData + (genericUUID->AtomicLength - 32), uuid_binfile, file_len);
                 genericUUID->AtomicLength += bin_bytes_read;
                 fclose(uuid_binfile);
 
@@ -2464,7 +2464,7 @@ int real_main(int argc, char *argv[])
                 char* keywords_globbed = strsep(&arg_keywords,"="); //separate out 'keyword='
                 keywords_globbed = strsep(&arg_keywords,"="); //this is what we want to work on: just the keywords
                 char* keyword_ptr = keywords_globbed;
-                uint32_t keyword_strlen = strlen(keywords_globbed);
+                uint32_t keyword_strlen = (uint32_t)strlen(keywords_globbed);
                 uint8_t keyword_count = 0;
                 uint32_t key_index = 0;
 
@@ -2484,7 +2484,7 @@ int real_main(int argc, char *argv[])
                 }
 
                 formed_keyword_struct = (char*)calloc(1, (sizeof(char)* set_UTF16_text) ? (keyword_strlen * 4) : (keyword_strlen * 2)); // *4 should carry utf16's BOM & TERM
-                uint32_t keyword_struct_bytes = APar_3GP_Keyword_atom_Format(keywords_globbed, keyword_count, set_UTF16_text, formed_keyword_struct);
+                uint64_t keyword_struct_bytes = APar_3GP_Keyword_atom_Format(keywords_globbed, keyword_count, set_UTF16_text, formed_keyword_struct);
 
                 for (uint8_t i_asset = 1; i_asset <= asset_iterations; i_asset++) {
                     AtomicInfo* keyword_asset = APar_UserData_atom_Init("kywd", keyword_strlen ? "temporary" : "", userdata_area, asset_iterations == 1 ? selected_track : i_asset, packed_lang); //just a "temporary" valid string to satisfy a test there

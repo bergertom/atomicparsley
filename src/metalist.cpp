@@ -116,7 +116,7 @@ void APar_Mark_UserData_area(uint8_t track_num, short userdata_atom, bool quantu
 //APar_SimplePrintUnicodeAssest contains a purely unicode string (either utf8 or utf16 with BOM)
 //and slight output formatting differences
 
-void APar_SimplePrintUnicodeAssest(char* unicode_string, int asset_length, bool print_encoding) { //3gp files
+void APar_SimplePrintUnicodeAssest(char* unicode_string, size_t asset_length, bool print_encoding) { //3gp files
 	if (strncmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
 		if (print_encoding) {
 			fprintf(stdout, " (utf16): ");
@@ -172,7 +172,7 @@ APar_Extract_uuid_binary_file
 		the file to the now fully formed uuid_outfile path.
 ----------------------*/
 void APar_Extract_uuid_binary_file(AtomicInfo* uuid_atom, const char* originating_file, char* output_path) {
-	uint32_t path_len = 0;
+	uint64_t path_len = 0;
 	uint64_t atom_offsets = 0;
 	char* uuid_outfile = (char*)calloc(1, sizeof(char)*MAXPATHLEN+1); //malloc a new string because it may be a cli arg for a specific output path	
 	if (output_path == NULL) {
@@ -306,7 +306,7 @@ APar_Extract_ID3v2_file
 	id3args - *currently not used* TODO: extract by mimetype or imagetype or description
 
     Extracts (all) files of a particular frame type (APIC or GEOB - GEOB is currently not implemented) out to a file next to the originating mpeg-4 file. First, match
-		frame_str to get the internal frameID number for APIC/GEOB frame. Locate the .ext of the origin file, duplicate the path including the basename (excluding the
+		frame_str to get the internal frameID number for APIC/GEOB frame. Locate the .ext of th/Volumes/Disk0/Coding/Github/atomicparsley/src/id3v2types.he origin file, duplicate the path including the basename (excluding the
 		extension. Loop through the linked list of ID3v2Frame and search for the internal frameID number.
 		When an image is found, test the data that the image contains and determine file extension from the ImageFileFormatDefinition structure (containing some popular
 		image format/extension definitions). In combination with the file extension, use the image description and image type to create the name of the output file.
@@ -322,7 +322,7 @@ void APar_Extract_ID3v2_file(AtomicInfo* id32_atom, const char* frame_str, const
 	int frameType = KnownFrames[frameID+1].ID3v2_FrameType;
 	
 	if (destination_folder == NULL) {
-		basepath_len = (strrchr(originfile, '.') - originfile);
+		basepath_len = (uint32_t)(strrchr(originfile, '.') - originfile);
 	}
 	
 	if (frameType == ID3_ATTACHED_PICTURE_FRAME || frameType == ID3_ATTACHED_OBJECT_FRAME) {
@@ -715,7 +715,7 @@ void APar_Print_APuuid_atoms(const char *path, char* output_path, uint8_t target
 //                          3GP asset metadata listings                              //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void APar_PrintUnicodeAssest(char* unicode_string, int asset_length) { //3gp files
+void APar_PrintUnicodeAssest(char* unicode_string, size_t asset_length) { //3gp files
 	if (strncmp(unicode_string, "\xFE\xFF", 2) == 0 ) { //utf16
 		fprintf(stdout, " (utf16)] : ");
 		
@@ -759,7 +759,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 	memset(bitpacked_lang, 0, 3);
 	unsigned char unpacked_lang[3];
 	
-	uint32_t box_length = parsedAtoms[userdata_atom].AtomicLength;
+	uint64_t box_length = parsedAtoms[userdata_atom].AtomicLength;
 	char* box_data = (char*)malloc(sizeof(char)*box_length);
 	memset(box_data, 0, sizeof(char)*box_length);
 	
@@ -790,7 +790,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			
 			fprintf(stdout, "[lang=%s", unpacked_lang);
 
-			APar_PrintUnicodeAssest(box_data, box_length);
+			APar_PrintUnicodeAssest(box_data, (size_t)box_length);
 			
 			if (box == 0x616C626D && track_num != 1000) {
 				fprintf(stdout, "  |  Track: %u", track_num);
@@ -818,7 +818,7 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			memset(box_data, 0, box_length);
 			APar_readX(box_data, source_file, parsedAtoms[userdata_atom].AtomicStart + 22, box_length-8);
 			
-			APar_PrintUnicodeAssest(box_data, box_length-8);
+			APar_PrintUnicodeAssest(box_data, (size_t)box_length-8);
 			fprintf(stdout, "\n");
 			break;
 		}
@@ -891,7 +891,8 @@ void APar_Print_single_userdata_atomcontents(uint8_t track_num, short userdata_a
 			//the length of the location string is unknown (max is box lenth), but the long/lat/alt/body/notes needs to be retrieved.
 			//test if the location string is utf16; if so search for 0x0000 (or if utf8, find the first NULL).
 			if ( strncmp(box_data, "\xFE\xFF", 2) == 0 ) {
-				box_offset+= 2 * widechar_len(box_data, box_length) + 2; //*2 for utf16 (double-byte); +2 for the terminating NULL
+				box_offset+= 2 *
+                widechar_len(box_data, box_length) + 2; //*2 for utf16 (double-byte); +2 for the terminating NULL
 				fprintf(stdout, "(utf16) ");
 			} else {
 				fprintf(stdout, "(utf8) ");
@@ -1385,7 +1386,7 @@ APar_PrintAtomicTree
 void APar_PrintAtomicTree() {
 	bool unknown_atom = false;
 	char* tree_padding = (char*)malloc(sizeof(char)*126); //for a 25-deep atom tree (4 spaces per atom)+single space+term.
-	uint32_t freeSpace = 0;
+	uint64_t freeSpace = 0;
 	short thisAtomNumber = 0;
 
 	printBOM();
@@ -1512,7 +1513,7 @@ void APar_PrintAtomicTree() {
 		mdatData, file_size - mdatData,
 		(double)(file_size - mdatData)/(double)file_size * 100.0 );
 
-	fprintf(stdout, "Total free atom space: %u bytes; %2.3lf%% waste.",
+	fprintf(stdout, "Total free atom space: %llu bytes; %2.3lf%% waste.",
 		freeSpace, (double)freeSpace/(double)file_size * 100.0 );
 
 	if (freeSpace) {

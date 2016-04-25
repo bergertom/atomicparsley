@@ -2070,7 +2070,7 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 			target_atom->AtomicLength += binary_bytes;
 
 		} else {
-			uint32_t total_bytes = 0;
+			size_t total_bytes = 0;
 
 			if (text_tag_style == UTF8_3GP_Style) {
 				total_bytes = (uint32_t)strlen(unicode_data);
@@ -2083,9 +2083,9 @@ void APar_Unified_atom_Put(AtomicInfo* target_atom, const char* unicode_data,
 
 				if (raw_bytes > total_bytes && total_bytes > 255) {
 
-					fprintf(stdout, "AtomicParsley warning: %s was trimmed to 255 characters (%u characters over)\n",
+					fprintf(stdout, "AtomicParsley warning: %s was trimmed to 255 characters (%zu characters over)\n",
 					        parsedAtoms[ APar_FindParentAtom(target_atom->AtomicNumber, target_atom->AtomicLevel) ].AtomicName,
-									                                 utf8_length(unicode_data+total_bytes, 0) );
+									                                utf8_length(unicode_data+total_bytes, 0) );
 				} else {
 					total_bytes = raw_bytes;
 				}
@@ -2122,8 +2122,7 @@ APar_atom_Binary_Put
     Simple placement of binary data (perhaps containing NULLs) onto AtomicData.
 		TODO: if over MAXDATA_PAYLOAD malloc a new char string
 ----------------------*/
-void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data,
-	uint32_t bytecount, uint64_t atomic_data_offset)
+void APar_atom_Binary_Put(AtomicInfo* target_atom, const char* binary_data, uint64_t bytecount, uint64_t atomic_data_offset)
 {
 	if (target_atom == NULL) return;
 
@@ -2349,7 +2348,7 @@ APar_3GP_Keyword_atom_Format
 		They also will possibly be converted to utf16 - and they NEED to start with the BOM then. Prefacing each keyword is the 8bit length of the string
 		And each keyword needs to be NULL terminated. Technically it would be possible to even have mixed encodings (not supported here).
 ----------------------*/
-uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct) {
+uint64_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_count, bool set_UTF16_text, char* &formed_keyword_struct) {
 	uint64_t formed_string_offset = 0;
 	uint64_t string_len = 0;
 
@@ -2359,13 +2358,13 @@ uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_co
 		string_len = strlen(a_keyword);
 		if (set_UTF16_text) {
 
-			uint32_t glyphs_req_bytes = mbstowcs(NULL, a_keyword, string_len+1) * 2; //passing NULL pre-calculates the size of wchar_t needed;
+			uint64_t glyphs_req_bytes = mbstowcs(NULL, a_keyword, string_len+1) * 2; //passing NULL pre-calculates the size of wchar_t needed;
 
 			formed_keyword_struct[formed_string_offset+1] = (char)(0xFE); //BOM
 			formed_keyword_struct[formed_string_offset+2] = (char)(0xFF); //BOM
 			formed_string_offset+=3; //BOM + keyword length that has yet to be set
 
-			int bytes_converted = UTF8ToUTF16BE((unsigned char*)(formed_keyword_struct + formed_string_offset), glyphs_req_bytes, (unsigned char*)a_keyword, string_len);
+			size_t bytes_converted = UTF8ToUTF16BE((unsigned char*)(formed_keyword_struct + formed_string_offset), glyphs_req_bytes, (unsigned char*)a_keyword, string_len);
 
 			if (bytes_converted > 1) {
 				formed_keyword_struct[formed_string_offset-3] = (uint8_t)bytes_converted + 4; //keyword length is NOW set
@@ -2373,7 +2372,7 @@ uint32_t APar_3GP_Keyword_atom_Format(char* keywords_globbed, uint8_t keyword_co
 			}
 		} else {
 
-			uint32_t string_len = strlen(a_keyword);
+			size_t string_len = strlen(a_keyword);
 			formed_keyword_struct[formed_string_offset] = (uint8_t)string_len + 1; //add the terminating NULL
 			formed_string_offset++;
 			memcpy(formed_keyword_struct + formed_string_offset, a_keyword, string_len );
@@ -2650,13 +2649,13 @@ AtomicInfo* APar_reverseDNS_atom_Init(const char* rDNS_atom_name, const char* rD
 		short rDNS_four_dash_parent = APar_InterjectNewAtom("----", PARENT_ATOM, SIMPLE_ATOM, 8, 0, 0, ilst_atom->AtomicLevel+1, last_iTunes_list_descriptor);
 
 		short rDNS_mean_atom = APar_InterjectNewAtom("mean", CHILD_ATOM, VERSIONED_ATOM, 12, AtomFlags_Data_Binary, 0, ilst_atom->AtomicLevel+2, rDNS_four_dash_parent);
-		uint32_t domain_len = strlen(rDNS_domain);
+		size_t domain_len = strlen(rDNS_domain);
 		parsedAtoms[rDNS_mean_atom].ReverseDNSdomain = (char*)calloc(1, sizeof(char)*101);
 		memcpy( parsedAtoms[rDNS_mean_atom].ReverseDNSdomain, rDNS_domain, domain_len );
 		APar_atom_Binary_Put(&parsedAtoms[rDNS_mean_atom], rDNS_domain, domain_len, 0);
 
 		short rDNS_name_atom = APar_InterjectNewAtom("name", CHILD_ATOM, VERSIONED_ATOM, 12, AtomFlags_Data_Binary, 0, ilst_atom->AtomicLevel+2, rDNS_mean_atom);
-		uint32_t name_len = strlen(rDNS_atom_name);
+		size_t name_len = strlen(rDNS_atom_name);
 		parsedAtoms[rDNS_name_atom].ReverseDNSname = (char*)calloc(1, sizeof(char)*101);
 		memcpy( parsedAtoms[rDNS_name_atom].ReverseDNSname, rDNS_atom_name, name_len );
 		APar_atom_Binary_Put(&parsedAtoms[rDNS_name_atom], rDNS_atom_name, name_len, 0);
@@ -3219,7 +3218,7 @@ bool APar_Readjust_iloc_atom(short iloc_number) {
 				fprintf(stdout, "debug: AP_Readjust_iloc_atom  item is %u bytes offset into atom (was %u, now %u)\n", exisiting_offset_into_atom, base_offset, new_item_offset);
 #endif
 				if (base_offset_size == 4) {
-					UInt32_TO_String4(new_item_offset, base_offset_ptr);
+					UInt32_TO_String4((uint32_t)new_item_offset, base_offset_ptr);
 				} else {
 					UInt64_TO_String8(new_item_offset, base_offset_ptr);
 				}
@@ -4534,7 +4533,7 @@ uint64_t APar_WriteAtomically(FILE* source_file, FILE* temp_file,
 	}
 
 	//write the length of the atom first... taken from our tree in memory
-	UInt32_TO_String4(parsedAtoms[this_atom].AtomicLength, twenty_byte_buffer);
+	UInt32_TO_String4((uint32_t)parsedAtoms[this_atom].AtomicLength, twenty_byte_buffer);
 	fseeko(temp_file, bytes_written_tally, SEEK_SET);
 	fwrite(twenty_byte_buffer, 4, 1, temp_file);
 	bytes_written += 4;

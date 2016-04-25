@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright ï¿½2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 		
 		----------------------
@@ -235,29 +235,29 @@ uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	return UInt64FromBigEndian(buffer);
 }
 
-void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint32_t length) {
+void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint64_t length) {
 	size_t size;
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect %lld, got %lu: %s\n", __FUNCTION__, length, size, strerror(errno));
 		exit(1);
 	}
 	return;
 }
 
-void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint32_t length) {
+void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint64_t length) {
 	size_t size;
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %u, got %u: %s\n", __FUNCTION__, length, (unsigned int) size, strerror(errno));
+		printf("%s read failed, expect %lld, got %zu: %s\n", __FUNCTION__, length, size, strerror(errno));
 		exit(1);
 	}
 	return;
 }
 
-uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to_read) {
-	uint32_t bytes_read = 0;
+uint64_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint64_t bytes_to_read) {
+	uint64_t bytes_read = 0;
 	if (destination_buffer != NULL) {
 		fseeko(a_file, 0, SEEK_SET); // not that 2gb support is required - malloc would probably have a few issues
 		bytes_read = fread(destination_buffer, 1, bytes_to_read, a_file);
@@ -266,7 +266,7 @@ uint32_t APar_ReadFile(char* destination_buffer, FILE* a_file, uint32_t bytes_to
 	return bytes_read;
 }
 
-uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number)
+uint64_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short an_atom, uint64_t start_position, uint32_t eval_number)
 {
 	uint64_t current_pos = start_position;
 	memset(uint32_buffer, 0, 5);
@@ -288,7 +288,7 @@ uint32_t APar_FindValueInAtom(char* uint32_buffer, FILE* ISObasemediafile, short
 			break;
 		}
 	}
-	return (uint32_t) current_pos;
+	return current_pos;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +305,7 @@ void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language) {
 
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is there a problem here? und does't work http://www.w3.org/WAI/ER/IG/ert/iso639.htm
 	//I think Apple's 3gp asses decoder is a little off. First, it doesn't support a lot of those 3 letter language codes above on that page. for example 'zul' blocks *all* metadata from showing up. 'fre' is a no-no, but 'fra' is fine.
-	//then, the spec calls for all strings to be null terminated. So then why does a '© 2005' (with a NULL at the end) show up as '© 2005' in 'pol', but '© 2005 ?' in 'fas' Farsi? Must be Apple's implementation, because the files are identical except for the uint16_t lang setting.
+	//then, the spec calls for all strings to be null terminated. So then why does a 'ï¿½ 2005' (with a NULL at the end) show up as 'ï¿½ 2005' in 'pol', but 'ï¿½ 2005 ?' in 'fas' Farsi? Must be Apple's implementation, because the files are identical except for the uint16_t lang setting.
 	
 	uint16_t packed_language = 0;
 	
@@ -503,7 +503,7 @@ uint32_t APar_get_mpeg4_time() {
 	uint32_t current_time_in_seconds = 0;
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	current_time_in_seconds = tv.tv_sec;
+	current_time_in_seconds = (uint32_t)tv.tv_sec;
 	return current_time_in_seconds + 2082844800;
 
 #endif
@@ -567,7 +567,7 @@ wchar_t* Convert_multibyteUTF8_to_wchar(const char* input_utf8) { //TODO: is thi
 	unsigned char* utf16_conversion = (unsigned char*)malloc( sizeof(unsigned char)* string_length * 2 );
 	memset(utf16_conversion, 0, string_length * 2 );
 			
-	int utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length);
+	size_t utf_16_glyphs = UTF8ToUTF16BE(utf16_conversion, char_glyphs * 2, (unsigned char*)input_utf8, string_length);
 	return_val = Convert_multibyteUTF16_to_wchar((char*)utf16_conversion, (size_t)utf_16_glyphs, false );
 	free(utf16_conversion); utf16_conversion=NULL;
 	return (return_val);
@@ -587,8 +587,8 @@ findstringNULLterm
 
     Either find the NULL if it exists and return how many bytes into in_string that NULL exists, or it won't find a NULL and return max_len
 ----------------------*/
-uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) {
-	uint32_t byte_count = 0;
+uint64_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint64_t max_len) {
+	uint64_t byte_count = 0;
 	
 	if (encodingFlag == 0x00 || encodingFlag == 0x03) {
 		char* bufptr = in_string;
@@ -613,8 +613,8 @@ uint32_t findstringNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max
 	return byte_count;
 }
 
-uint32_t skipNULLterm (char* in_string, uint8_t encodingFlag, uint32_t max_len) {
-	uint32_t byte_count = 0;
+uint64_t skipNULLterm (char* in_string, uint8_t encodingFlag, uint64_t max_len) {
+	uint64_t byte_count = 0;
 	
 	if (encodingFlag == 0x00 || encodingFlag == 0x03) {
 		char* bufptr = in_string;
@@ -726,9 +726,9 @@ double fixed_point_16x16bit_to_double(uint32_t fixed_point) {
 	return return_val;
 }
 
-uint32_t widechar_len(char* instring, uint32_t _bytes_) {
-	uint32_t wstring_len = 0;
-	for (uint32_t i = 0; i <= _bytes_/2 ; i++) {
+uint64_t widechar_len(char* instring, uint64_t _bytes_) {
+	uint64_t wstring_len = 0;
+	for (uint64_t i = 0; i <= _bytes_/2 ; i++) {
 		if ( instring[0] == 0 && instring[1] == 0) {
 			break;
 		} else {
@@ -802,7 +802,7 @@ bool APar_assert(bool expression, int error_msg, const char* supplemental_info) 
 
 typedef unsigned long xorgenUINT;
 
-unsigned long xor4096i() {
+int64_t xor4096i() {
   /* 32-bit or 64-bit integer random number generator 
      with period at least 2**4096-1.
      

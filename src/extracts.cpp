@@ -37,8 +37,8 @@ APar_skip_filler
     I can't remember where exactly I stumbled over what to skip, but this touches on it: http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt
 		(not that everything there is the gospel truth).
 ----------------------*/
-uint8_t APar_skip_filler(FILE* isofile, uint32_t start_position) {
-	uint8_t skip_bytes = 0;
+uint64_t APar_skip_filler(FILE* isofile, uint64_t start_position) {
+	uint64_t skip_bytes = 0;
 
 	while (true) {
 		uint8_t eval_byte = APar_read8(isofile, start_position + skip_bytes);
@@ -947,7 +947,7 @@ void APar_Extract_esds_Info(char* uint32_buffer, FILE* isofile, short track_leve
 						track_info->descriptor_object_typeID = packed_objID >> 3;
 						offset_into_esds+=1;
 
-						track_info->channels = (uint16_t)APar_ExtractChannelInfo(isofile, esds_start + offset_into_esds);
+						track_info->channels = (uint16_t)APar_ExtractChannelInfo(isofile, (uint32_t)(esds_start + offset_into_esds));
 
 					} else if (track_info->type_of_track & VIDEO_TRACK) {
 						//technically, visual_object_sequence_start_code should be tested aginst 0x000001B0
