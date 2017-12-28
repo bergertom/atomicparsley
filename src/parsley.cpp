@@ -1302,7 +1302,7 @@ void APar_ScanAtoms(const char *path, bool deepscan_REQ) {
 
 					uuid_info.uuid_form = UUID_DEPRECATED_FORM; //start with the assumption that any found atom is in the depracted uuid form
 
-					APar_readX_noseek(data, file, 12);
+					APar_readX_noseek(data, file, 8); // read only 8 bytes
 					char *atom = data+4;
 					dataSize = UInt32FromBigEndian(data);
 
