@@ -852,11 +852,11 @@ int64_t xor4096i() {
   
   if ((i < 0) || (seed != zero)) { /* Initialisation necessary */
   
-  /* weyl = odd approximation to 2**wlen*(sqrt(5)-1)/2. */
-
+    /* weyl = odd approximation to 2**wlen*(sqrt(5)-1)/2. */
+    /* code will never be executed, OSX is a 64-bit platform
     if (UINT32) 
       weyl = 0x61c88647;
-    else 
+    else */
       weyl = ((((xorgenUINT)0x61c88646)<<16)<<16) + (xorgenUINT)0x80b583eb;
                  
     v = (seed!=zero)? seed:~seed;  /* v must be nonzero */

@@ -7,9 +7,18 @@ The original code v0.9.0, which was last updated in 2006 is located here: [atomi
 
 For my project, I have forked the latest version I could find, dated 2014, from [Dan Drusch](https://github.com/DanDrusch/atomicparsley.git).
 
-My instructions below are for OSX.
+My instructions below are for OSX only; sorry.
 
-## Setup the build environment:
+## Build using Xcode
+
+I am now building using Xcode v9.2.
+
+
+## Legacy Setup the build environment:
+
+Now that I'm using Xcode, the instructions below for a command-line build are not used.
+
+I keep them here for reference- to show how this sourcec-code archive was created.
 
 ### 1.Install the OSX C-compiler
  * Logon to https://developer.apple.com/downloads/

@@ -1112,10 +1112,12 @@ int real_main(int argc, char *argv[])
     c = getopt_long(argc, argv, "hTtEe:a:b:c:d:f:g:i:k:l:n:o:p:q::u:w:x:y:z:A:B:C:D:F:G:H:I:J:K:L:MN:QR:S:U:WXV:ZP", long_options, &option_index);
 
     if (c == -1) {
+        /* code will never be executed (the Xcode warning is correct)
         if (argc < 3 && argc > 2) {
             APar_ScanAtoms(ISObasemediafile, true);
             APar_PrintAtomicTree();
         }
+         */
         break;
     }
 
