@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6004598E1C95FFA500C317AF /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6004598D1C95FFA500C317AF /* libz.1.2.5.dylib */; };
 		6080DBD21C89B93000F4847F /* arrays.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6080DBBD1C89B93000F4847F /* arrays.cpp */; };
 		6080DBD31C89B93000F4847F /* CDtoc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6080DBBE1C89B93000F4847F /* CDtoc.cpp */; };
 		6080DBD41C89B93000F4847F /* compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6080DBBF1C89B93000F4847F /* compress.cpp */; };
@@ -22,6 +21,7 @@
 		6080DBDD1C89B93000F4847F /* uuid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6080DBC81C89B93000F4847F /* uuid.cpp */; };
 		6080DBDF1C89BA9000F4847F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6080DBDE1C89BA9000F4847F /* CoreFoundation.framework */; };
 		6080DBE11C89BB5200F4847F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6080DBE01C89BB5200F4847F /* IOKit.framework */; };
+		60941C6D20493E5300538A47 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60941C6C20493E5300538A47 /* libz.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,7 +37,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6004598D1C95FFA500C317AF /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = ../../../../../usr/lib/libz.1.2.5.dylib; sourceTree = "<group>"; };
 		6080DBBD1C89B93000F4847F /* arrays.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arrays.cpp; path = src/arrays.cpp; sourceTree = "<group>"; };
 		6080DBBE1C89B93000F4847F /* CDtoc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CDtoc.cpp; path = src/CDtoc.cpp; sourceTree = "<group>"; };
 		6080DBBF1C89B93000F4847F /* compress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = compress.cpp; path = src/compress.cpp; sourceTree = "<group>"; };
@@ -62,6 +61,7 @@
 		6080DBDE1C89BA9000F4847F /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		6080DBE01C89BB5200F4847F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		608C77C01C88678C009231E7 /* AtomicParsley */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AtomicParsley; sourceTree = BUILT_PRODUCTS_DIR; };
+		60941C6C20493E5300538A47 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libz.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,9 +69,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60941C6D20493E5300538A47 /* libz.a in Frameworks */,
 				6080DBE11C89BB5200F4847F /* IOKit.framework in Frameworks */,
 				6080DBDF1C89BA9000F4847F /* CoreFoundation.framework in Frameworks */,
-				6004598E1C95FFA500C317AF /* libz.1.2.5.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,7 +81,7 @@
 		608C77B71C88678C009231E7 = {
 			isa = PBXGroup;
 			children = (
-				6004598D1C95FFA500C317AF /* libz.1.2.5.dylib */,
+				60941C6C20493E5300538A47 /* libz.a */,
 				6080DBE01C89BB5200F4847F /* IOKit.framework */,
 				6080DBDE1C89BA9000F4847F /* CoreFoundation.framework */,
 				6080DBBD1C89B93000F4847F /* arrays.cpp */,
@@ -148,6 +148,8 @@
 				TargetAttributes = {
 					608C77BF1C88678C009231E7 = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 9UW72E9P27;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -289,7 +291,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9UW72E9P27;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -297,7 +307,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9UW72E9P27;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

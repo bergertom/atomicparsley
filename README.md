@@ -13,6 +13,9 @@ My instructions below are for OSX only; sorry.
 
 I am now building using Xcode v9.2.
 
+Under the Releases tab, you find a binary executable, signed with my developer account.
+To run it, allow "App Store and identified developers" in the "Security & Privacy" control panel.
+
 
 ## Legacy Setup the build environment:
 
