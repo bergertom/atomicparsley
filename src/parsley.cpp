@@ -24,7 +24,7 @@
     * Mike Brancato - Debian patches & build support
     * Lowell Stewart - null-termination bugfix for Apple compliance
 		* Brian Story - native Win32 patches; memset/framing/leaks fixes
-	* Thomas Berger - replaced (c) symbol "(c)" with \xA8
+	* Thomas Berger - replaced (c) symbol "(c)" with \251
                                                                    */
 //==================================================================//
 
@@ -2168,8 +2168,8 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 	if (metadata_style == ITUNES_STYLE) {
 		const char* standard_genre_atom = "moov.udta.meta.ilst.gnre";
 		const char* std_genre_data_atom = "moov.udta.meta.ilst.gnre.data";
-		const char* custom_genre_atom = "moov.udta.meta.ilst.\xa9gen";
-		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.\xa9gen.data";
+		const char* custom_genre_atom = "moov.udta.meta.ilst.\251gen";
+		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.\251gen.data";
 
 		if ( strlen(atomPayload) == 0) {
 			APar_RemoveAtom(std_genre_data_atom, VERSIONED_ATOM, 0); //find the atom; don't create if it's "" to remove
@@ -2183,13 +2183,13 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 			modified_atoms = true;
 
 			if (genre_number != 0) {
-				//first find if a custom genre atom ("\xA9gen") exists; erase the custom-string genre atom in favor of the standard genre atom
+				//first find if a custom genre atom ("\251gen") exists; erase the custom-string genre atom in favor of the standard genre atom
 
 				AtomicInfo* verboten_genre_atom = APar_FindAtom(custom_genre_atom, false, SIMPLE_ATOM, 0);
 
 				if (verboten_genre_atom != NULL) {
 					if (strlen(verboten_genre_atom->AtomicName) > 0) {
-						if (strncmp(verboten_genre_atom->AtomicName, "\xa9gen", 4) == 0) {
+						if (strncmp(verboten_genre_atom->AtomicName, "\251gen", 4) == 0) {
 							APar_RemoveAtom(cstm_genre_data_atom, VERSIONED_ATOM, 0);
 						}
 					}
@@ -2235,7 +2235,7 @@ void APar_MetaData_atomLyrics_Set(const char* lyricsPath) {
         APar_Verify__udta_meta_hdlr__atom();
         modified_atoms = true;
         
-        AtomicInfo* lyricsData_atom = APar_FindAtom("moov.udta.meta.ilst.\xA8lyr.data", true, VERSIONED_ATOM, 0);
+        AtomicInfo* lyricsData_atom = APar_FindAtom("moov.udta.meta.ilst.\251lyr.data", true, VERSIONED_ATOM, 0);
         APar_MetaData_atom_QuickInit(lyricsData_atom->AtomicNumber, AtomFlags_Data_Text, 0, file_len + 1);
         
         FILE* lyrics_file = APar_OpenFile(lyricsPath, "rb");
