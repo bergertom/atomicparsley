@@ -1468,7 +1468,12 @@ void APar_PrintAtomicTree() {
 				APar_fprintf_UTF8_data(twenty_byte_buffer);
 				fprintf(stdout, " @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			} else {
-				fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64, tree_padding, twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
+                for (int i = 0; i < 8; i++) {
+                    unsigned char c = ((char*)twenty_byte_buffer)[i] ;
+                    printf ("%02x ", c) ;
+                }
+                fprintf(stdout, "%sAtom %s @ %" PRIu64 " of size: %" PRIu64 ", ends @ %" PRIu64, tree_padding,
+                        twenty_byte_buffer, thisAtom->AtomicStart, thisAtom->AtomicLength, (thisAtom->AtomicStart + thisAtom->AtomicLength) );
 			}
 
 			if (thisAtom->AtomicContainerState == UNKNOWN_ATOM_TYPE) {
