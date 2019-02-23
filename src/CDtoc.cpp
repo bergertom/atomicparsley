@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_CDTOC.cpp
+    AtomicParsley - CDtoc.cpp
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright �2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//

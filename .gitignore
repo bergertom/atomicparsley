@@ -15,4 +15,6 @@
 src/config.h.in
 src/stamp-h1
 /test/
-
+/src/*.o
+AtomicParsley.xcodeproj/project.xcworkspace/xcuserdata/*
+AtomicParsley.xcodeproj/xcuserdata/*

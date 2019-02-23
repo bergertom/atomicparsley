@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_commons.cpp
+    AtomicParsley - util.cpp
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright �2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 		
 		----------------------
@@ -190,13 +190,20 @@ bool IsUnicodeWinOS() {
 //                             File reading routines                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
+const char *APar_strferror(FILE *f) {
+	if (feof(f) && ferror(f)) return "error and end of file";
+	else if (feof(f)) return "end of file";
+	else if (ferror(f)) return "error";
+	else return "neither error nor end of file";
+}
+
 uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos) {
 	uint8_t a_byte = 0;
 	size_t size;
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(&a_byte, 1, 1, ISObasemediafile);
 	if(size != 1) {
-		printf("%s read failed, expect 1, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 1, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return a_byte;
@@ -207,7 +214,7 @@ uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 2, ISObasemediafile);
 	if(size != 2) {
-		printf("%s read failed, expect 2, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 2, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt16FromBigEndian(buffer);
@@ -218,7 +225,7 @@ uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 4, ISObasemediafile);
 	if(size != 4) {
-		printf("%s read failed, expect 4, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 4, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt32FromBigEndian(buffer);
@@ -229,7 +236,7 @@ uint64_t APar_read64(char* buffer, FILE* ISObasemediafile, uint64_t pos) {
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, 8, ISObasemediafile);
 	if(size != 8) {
-		printf("%s read failed, expect 8, got %u: %s\n", __FUNCTION__, (unsigned int)size, strerror(errno));
+		printf("%s read failed, expect 8, got %u: %s\n", __FUNCTION__, (unsigned int)size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return UInt64FromBigEndian(buffer);
@@ -239,7 +246,7 @@ void APar_readX_noseek(char* buffer, FILE* ISObasemediafile, uint64_t length) {
 	size_t size;
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %lld, got %lu: %s\n", __FUNCTION__, length, size, strerror(errno));
+		printf("%s read failed, expect %" PRIu64 ", got %" PRIuPTR ": %s\n", __FUNCTION__, length, size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;
@@ -250,7 +257,7 @@ void APar_readX(char* buffer, FILE* ISObasemediafile, uint64_t pos, uint64_t len
 	fseeko(ISObasemediafile, pos, SEEK_SET);
 	size = fread(buffer, 1, length, ISObasemediafile);
 	if(size != length) {
-		printf("%s read failed, expect %lld, got %zu: %s\n", __FUNCTION__, length, size, strerror(errno));
+		printf("%s read failed, expect %" PRIu64 ", got %" PRIuPTR ": %s\n", __FUNCTION__, length, size, APar_strferror(ISObasemediafile));
 		exit(1);
 	}
 	return;
@@ -305,7 +312,7 @@ void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language) {
 
 uint16_t PackLanguage(const char* language_code, uint8_t lang_offset) { //?? is there a problem here? und does't work http://www.w3.org/WAI/ER/IG/ert/iso639.htm
 	//I think Apple's 3gp asses decoder is a little off. First, it doesn't support a lot of those 3 letter language codes above on that page. for example 'zul' blocks *all* metadata from showing up. 'fre' is a no-no, but 'fra' is fine.
-	//then, the spec calls for all strings to be null terminated. So then why does a '� 2005' (with a NULL at the end) show up as '� 2005' in 'pol', but '� 2005 ?' in 'fas' Farsi? Must be Apple's implementation, because the files are identical except for the uint16_t lang setting.
+	//then, the spec calls for all strings to be null terminated. So then why does a '(c) 2005' (with a NULL at the end) show up as '(c) 2005' in 'pol', but '(c) 2005 ?' in 'fas' Farsi? Must be Apple's implementation, because the files are identical except for the uint16_t lang setting.
 	
 	uint16_t packed_language = 0;
 	
@@ -538,8 +545,8 @@ wchar_t* Convert_multibyteUTF16_to_wchar(char* input_unicode, size_t glyph_lengt
 		BOM_mark_bytes = 2;
 	}
 	
-	wchar_t* utf16_data = (wchar_t*)malloc( sizeof(wchar_t)* glyph_length ); //just to be sure there will be a trailing NULL
-	wmemset(utf16_data, 0, glyph_length);
+	wchar_t* utf16_data = (wchar_t*)malloc( sizeof(wchar_t)* (glyph_length+1)); //just to be sure there will be a trailing NULL
+	wmemset(utf16_data, 0, glyph_length + 1);
 						
 	for(size_t i = 0; i < glyph_length; i++) {
 #if defined (__ppc__) || defined (__ppc64__)

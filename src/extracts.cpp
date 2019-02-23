@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_AtomExtracts.cpp
+    AtomicParsley - extracts.cpp
 
     AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 																																		*/
 //==================================================================//
@@ -274,13 +274,13 @@ void APar_ShowMPEG4VisualProfileInfo(TrackInfo* track_info) {
 	} else if (mp4v_profile == 0xB4) {
 		fprintf(stdout, "Advanced Coding Efficiency Profile, Level 4"); //10110100
 
-	//Reserved 10110101 Ð 11000000
+	//Reserved 10110101 - 11000000
 	} else if (mp4v_profile == 0xC1) {
 		fprintf(stdout, "Advanced Core Profile, Level 1"); //11000001
 	} else if (mp4v_profile == 0xC2) {
 		fprintf(stdout, "Advanced Core Profile, Level 2"); //11000010
 
-	//Reserved 11000011 Ð 11010000
+	//Reserved 11000011 - 11010000
 	} else if (mp4v_profile == 0xD1) {
 		fprintf(stdout, "Advanced Scalable Texture, Level 1"); //11010001
 	} else if (mp4v_profile == 0xD2) {
@@ -775,7 +775,7 @@ APar_ExtractChannelInfo
 
     The channel info in esds is bitpacked, so read it in isolation and shift the bits around to get at it
 ----------------------*/
-uint8_t APar_ExtractChannelInfo(FILE* isofile, uint32_t pos) {
+uint8_t APar_ExtractChannelInfo(FILE* isofile, uint64_t pos) {
 	uint8_t packed_channels = APar_read8(isofile, pos);
 	uint8_t unpacked_channels = (packed_channels << 1); //just shift the first bit off the table
 	unpacked_channels = (unpacked_channels >> 4); //and slide it on over back on the uint8_t
@@ -947,7 +947,7 @@ void APar_Extract_esds_Info(char* uint32_buffer, FILE* isofile, short track_leve
 						track_info->descriptor_object_typeID = packed_objID >> 3;
 						offset_into_esds+=1;
 
-						track_info->channels = (uint16_t)APar_ExtractChannelInfo(isofile, (uint32_t)(esds_start + offset_into_esds));
+						track_info->channels = (uint16_t)APar_ExtractChannelInfo(isofile, esds_start + offset_into_esds);
 
 					} else if (track_info->type_of_track & VIDEO_TRACK) {
 						//technically, visual_object_sequence_start_code should be tested aginst 0x000001B0
@@ -1110,7 +1110,7 @@ void APar_ExtractTrackDetails(char* uint32_buffer, FILE* isofile, Trackage* trac
 		track_info->protected_codec = APar_read32(uint32_buffer, isofile, parsedAtoms[track->track_atom].AtomicStart + 8);
 	}
 
-	//Encoder string; occasionally, it appears under stsd for a video track; it is typcally preceded by ' ²' (1st char is unprintable) or 0x01B2
+	//Encoder string; occasionally, it appears under stsd for a video track; it is typcally preceded by ' (c)' (1st char is unprintable) or 0x01B2
 	if (track_info->contains_esds) {
 		APar_TrackLevelInfo(track, "esds");
 
@@ -1271,7 +1271,7 @@ void APar_ExtractDetails(FILE* isofile, uint8_t optional_output) {
 				}
 
 				//codec, language
-				fprintf(stdout, "  %s  %s   %" PRIu64 "", uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
+				fprintf(stdout, "  %s  %s   %" PRIu64, uint32tochar4(track_info.track_codec, uint32_buffer), track_info.unpacked_lang, track_info.sample_aggregate);
 
 				if (track_info.encoder_name[0] != 0 && track_info.contains_esds) {
 					purge_extraneous_characters(track_info.encoder_name);

@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_commons.h
+    AtomicParsley - util.h
 
     AtomicParsley is GPL software; you can freely distribute,
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright �2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 																																		*/
 //==================================================================//
@@ -51,6 +51,7 @@ HANDLE APar_OpenFileWin32(const char* utf8_filepath, DWORD dwDesiredAccess, DWOR
 #endif
 bool IsUnicodeWinOS();
 
+const char *APar_strferror(FILE *f);
 uint8_t APar_read8(FILE* ISObasemediafile, uint64_t pos);
 uint16_t APar_read16(char* buffer, FILE* ISObasemediafile, uint64_t pos);
 uint32_t APar_read32(char* buffer, FILE* ISObasemediafile, uint64_t pos);

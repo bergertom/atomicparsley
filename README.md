@@ -6,12 +6,13 @@ AtomicParsley is a lightweight command line program for reading, parsing and set
 The original code v0.9.0, which was last updated in 2006 is located here: [atomicparsley.sf.net](http://atomicparsley.sourceforge.net).
 
 For my project, I have forked the latest version I could find, dated 2014, from [Dan Drusch](https://github.com/DanDrusch/atomicparsley.git).
+In 2019 I have manually merged new updates from sourceforge.
 
 My instructions below are for OSX only; sorry.
 
 ## Build using Xcode
 
-I am now building using Xcode v9.2.
+I am now building using Xcode v9.4.1.
 
 Under the Releases tab, you find a binary executable, signed with my developer account.
 To run it, allow "App Store and identified developers" in the "Security & Privacy" control panel.
@@ -75,6 +76,6 @@ This will generate the AtomicParsley executeable.
   ./configure --disable-universal
    make
 ```
-   
+I am just using Xcode ...
   
 

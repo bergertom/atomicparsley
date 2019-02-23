@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright �2005-2007 puck_lock
+    Copyright (c)2005-2007 puck_lock
     with contributions from others; see the CREDITS file
 
     ----------------------
@@ -35,7 +35,19 @@
 #define OPT_ExtractPix           'E'
 #define OPT_ExtractPixToPath     'e'
 #define Meta_artist              'a'
+#define Meta_artDirector         0xC6
+#define Meta_arranger            0xC8
+#define Meta_author              0xC9
+#define Meta_conductor           0xD0
+#define Meta_director            0xD1
+#define Meta_originalArtist      0xD2
+#define Meta_producer            0xD3
+//#define Meta_performer           0xD4
+#define Meta_soundEngineer       0xD5
+#define Meta_soloist             0xD6
+#define Meta_executiveProducer   0xD7
 #define Meta_songtitle           's'
+#define Meta_subtitle            0xC5
 #define Meta_album               'b'
 #define Meta_tracknum            'k'
 #define Meta_disknum             'd'
@@ -43,6 +55,7 @@
 #define Meta_comment             'c'
 #define Meta_year                'y'
 #define Meta_lyrics              'l'
+#define Meta_lyrics_file         0xC7
 #define Meta_composer            'w'
 #define Meta_copyright           'x'
 #define Meta_grouping            'G'
@@ -69,7 +82,9 @@
 #define Meta_PurchaseDate        'D'
 #define Meta_apID                'Y'
 #define Meta_cnID                0xC0
+#define Meta_geID                0xC2
 #define Meta_xID                 0xC3
+#define Meta_storedescription    0xC4
 #define Meta_EncodingTool        0xB7
 #define Meta_EncodedBy           0xC1
 #define Meta_PlayGapless         0xBA
@@ -158,6 +173,7 @@ static const char* shortHelp_text =
 "  --comment      (string)     Set the comment tag\n"
 "  --year         (num|UTC)    Year tag (see --longhelp for \"Release Date\")\n"
 "  --lyrics       (string)     Set lyrics (not subject to 256 byte limit)\n"
+"  --lyricsFile   (/path)      Set lyrics to the content of a file\n"
 "  --composer     (string)     Set the composer tag\n"
 "  --copyright    (string)     Set the copyright tag\n"
 "  --grouping     (string)     Set the grouping tag\n"
@@ -165,11 +181,12 @@ static const char* shortHelp_text =
 "  --bpm          (number)     Set the tempo/bpm\n"
 "  --albumArtist  (string)     Set the album artist tag\n"
 "  --compilation  (boolean)    Set the compilation flag (true or false)\n"
-"  --hdvideo      (number)     Set the hdvideo flag (0=SD 1=720p 2=1080p)\n"
+"  --hdvideo      (boolean)    Set the hdvideo flag (true or false)\n"
 "  --advisory     (string*)    Content advisory (*values: 'clean', 'explicit')\n"
 "  --stik         (string*)    Sets the iTunes \"stik\" atom (see --longhelp)\n"
 "  --description  (string)     Set the description tag\n"
 "  --longdesc     (string)     Set the long description tag\n"
+"  --storedesc    (string)     Set the store description tag\n"
 "  --TVNetwork    (string)     Set the TV Network name\n"
 "  --TVShowName   (string)     Set the TV Show name\n"
 "  --TVEpisode    (string)     Set the TV episode/production code\n"
@@ -185,7 +202,8 @@ static const char* shortHelp_text =
 "  --encodedBy    (string)     Set the name of the Person/company who encoded the file\n"
 "  --apID         (string)     Set the Account Name\n"
 "  --cnID         (number)     Set the iTunes Catalog ID (see --longhelp)\n"
-"  --xid          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
+"  --geID         (number)     Set the iTunes Genre ID (see --longhelp)\n"
+"  --xID          (string)     Set the vendor-supplied iTunes xID (see --longhelp)\n"
 "  --gapless      (boolean)    Set the gapless playback flag\n"
 "  --contentRating (string*)   Set tv/mpaa rating (see -rDNS-help)\n"
 "\n"
@@ -239,6 +257,7 @@ static const char* longHelp_text =
 "  --year             ,  -y   (num|UTC)    Set the year tag: \"moov.udta.meta.ilst.\302\251day.data\"\n"
 "                                          set with UTC \"2006-09-11T09:00:00Z\" for Release Date\n"
 "  --lyrics           ,  -l   (str)    Set the lyrics tag: \"moov.udta.meta.ilst.\302\251lyr.data\"\n"
+"  --lyricsFile       ,       (/path)  Set the lyrics tag to the content of a file\n"
 "  --composer         ,  -w   (str)    Set the composer tag: \"moov.udta.meta.ilst.\302\251wrt.data\"\n"
 "  --copyright        ,  -x   (str)    Set the copyright tag: \"moov.udta.meta.ilst.cprt.data\"\n"
 "  --grouping         ,  -G   (str)    Set the grouping tag: \"moov.udta.meta.ilst.\302\251grp.data\"\n"
@@ -247,7 +266,7 @@ static const char* longHelp_text =
 "  --bpm              ,  -B   (num)    Set the tempo/bpm tag: \"moov.udta.meta.ilst.tmpo.data\"\n"
 "  --albumArtist      ,  -A   (str)    Set the album artist tag: \"moov.udta.meta.ilst.aART.data\"\n"
 "  --compilation      ,  -C   (bool)   Sets the \"cpil\" atom (true or false to delete the atom)\n"
-"  --hdvideo          ,  -V   (num)    Sets the \"hdvd\" atom (0=SD 1=720p 2=1080p)\n"
+"  --hdvideo          ,  -V   (bool)   Sets the \"hdvd\" atom (true or false to delete the atom)\n"
 "  --advisory         ,  -y   (1of3)   Sets the iTunes lyrics advisory ('remove', 'clean', 'explicit') \n"
 "  --stik             ,  -S   (1of7)   Sets the iTunes \"stik\" atom (--stik \"remove\" to delete) \n"
 "                                           \"Movie\", \"Normal\", \"TV Show\" .... others: \n"
@@ -257,9 +276,10 @@ static const char* longHelp_text =
 "  --description      ,  -p   (str)    Sets the description on the \"desc\" atom\n"
 "  --Rating           ,       (str)    Sets the Rating on the \"rate\" atom\n"
 "  --longdesc         ,  -j   (str)    Sets the long description on the \"ldes\" atom\n"
+"  --storedesc        ,       (str)    Sets the iTunes store description on the \"sdes\" atom\n"
 "  --TVNetwork        ,  -n   (str)    Sets the TV Network name on the \"tvnn\" atom\n"
 "  --TVShowName       ,  -H   (str)    Sets the TV Show name on the \"tvsh\" atom\n"
-"  --TVEpisode        ,  -I   (str)    Sets the TV Episode on \"tven\":\"209\", but its a string: \"209 Part 1\"\n"
+"  --TVEpisode        ,  -I   (str)    Sets the TV Episode on \"tven\":\"209\", but it is a string: \"209 Part 1\"\n"
 "  --TVSeasonNum      ,  -U   (num)    Sets the TV Season number on the \"tvsn\" atom\n"
 "  --TVEpisodeNum     ,  -N   (num)    Sets the TV Episode number on the \"tves\" atom\n"
 
@@ -274,11 +294,24 @@ static const char* longHelp_text =
 "  --encodedBy        ,       (str)    Set the name of the Person/company who encoded the file on the \"\302\251enc\" atom\n"
 "  --apID             ,  -Y   (str)    Set the name of the Account Name on the \"apID\" atom\n"
 "  --cnID             ,       (num)    Set iTunes Catalog ID, used for combining SD and HD encodes in iTunes on the \"cnID\" atom\n"
-"                                       (To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file)\n"
-"                                       (Must not use \"stik\" of value Movie(0), use Short Film(9))\n"
-"                                       (A bad idea for numbers is from http://www.imdb.com/ listings)\n"
-"                                       (A better idea for numbers is from the iTunes Store URL)\n"
-"  --xid              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
+"\n"
+"                                      To combine you must set \"hdvd\" atom on one file and must have same \"stik\" on both file\n"
+"                                      Must not use \"stik\" of value Home Video(0), use Movie(9)\n"
+"\n"
+"                                      iTunes Catalog numbers can be obtained by finding the item in the iTunes Store.  Once item\n"
+"                                      is found in the iTunes Store right click on picture of item and select copy link.  Paste this link\n"
+"                                      into a document or web browser to display the catalog number ID.\n"
+"\n"
+"                                      An example link for the video Street Kings is:\n"
+"                                      http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewMovie?id=278743714&s=143441\n"
+"                                      Here you can see the cnID is 278743714\n"
+"\n"
+"                                      Alternatively you can use iMDB numbers, however these will not match the iTunes catalog.\n"
+"\n"
+"  --geID             ,       (num)    Set iTunes Genre ID.  This does not necessarily have to match genre.\n"
+"                                      See --genre-movie-id-list and --genre-tv-id-list\n"
+"\n"
+"  --xID              ,       (str)    Set iTunes vendor-supplied xID, used to allow iTunes LPs and iTunes Extras to interact \n"
 "                                            with other content in your iTunes Library\n"
 "  --gapless          ,       (bool)   Sets the gapless playback flag for a track in a gapless album\n"
 
@@ -343,7 +376,7 @@ static const char* fileLevelHelp_text =
 "------------------------------------------------------------------------------------------------\n"
 " Atom reading services:\n"
 "\n"
-"  --test             ,  -T           Tests file to see if its a valid MPEG-4 file.\n"
+"  --test             ,  -T           Tests file to see if it is a valid MPEG-4 file.\n"
 "                                     Prints out the hierarchical atom tree.\n"
 "                        -T 1         Supplemental track level info with \"-T 1\"\n"
 "                        -T +dates    Track level with creation/modified dates\n"
@@ -825,7 +858,7 @@ void find_optional_args(char *argv[], int start_optindargs, uint16_t &packed_lan
             } else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
                 char* track_index_str = argv[optind + i];
                 strsep(&track_index_str, "=");
-                sscanf(track_index_str, "%" PRIu8 "", &trk_idx);
+                trk_idx = strtoul(track_index_str, NULL, 10);
                 udta_container = SINGLE_TRACK_ATOM;
             } else if ( strcmp(argv[optind + i], "track") == 0 ) {
                 udta_container = ALL_TRACKS_ATOM;
@@ -866,7 +899,7 @@ void scan_ID3_optargs(char *argv[], int start_optargs, const char* &target_lang,
             } else if ( strncmp(argv[optind + i], "track=", 6) == 0 ) {
                 char* track_index_str = argv[optind + i];
                 strsep(&track_index_str, "=");
-                sscanf(track_index_str, "%hhu", meta_container);
+                *meta_container = strtoul(track_index_str, NULL, 10);
             }
         }
 
@@ -932,7 +965,7 @@ int real_main(int argc, char *argv[])
             exit(0);
         } else if ( (strcmp(argv[1],"--longhelp") == 0) || (strcmp(argv[1],"-longhelp") == 0) || (strcmp(argv[1],"-Lh") == 0) ) {
 #if defined (_WIN32)
-            if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve � characters
+            if (UnicodeOutputStatus == WIN32_UTF16) { //convert the helptext to utf16 to preserve (c) characters
                 int help_len = strlen(longHelp_text)+1;
                 wchar_t* Lhelp_text = (wchar_t *)malloc(sizeof(wchar_t)*help_len);
                 wmemset(Lhelp_text, 0, help_len);
@@ -980,6 +1013,12 @@ int real_main(int argc, char *argv[])
         } else if (strcmp(argv[1], "--ratings-list") == 0) {
             ListMediaRatings(); exit(0);
 
+        } else if (strcmp(argv[1], "--genre-movie-id-list") == 0) {
+            ListMovieGenreIDValues(); exit(0);
+
+        } else if (strcmp(argv[1], "--genre-tv-id-list") == 0) {
+            ListTVGenreIDValues(); exit(0);
+
         } else if (strcmp(argv[1], "--ID3frames-list") == 0) {
             ListID3FrameIDstrings(); exit(0);
 
@@ -1020,7 +1059,19 @@ int real_main(int argc, char *argv[])
         { "extractPix",                       0,  NULL,           OPT_ExtractPix },
         { "extractPixToPath", required_argument,  NULL,           OPT_ExtractPixToPath },
         { "artist",           required_argument,  NULL,           Meta_artist },
+        { "artDirector",      required_argument,  NULL,           Meta_artDirector },
+        { "arranger",         required_argument,  NULL,           Meta_arranger },
+        { "author",           required_argument,  NULL,           Meta_author },
+        { "conductor",        required_argument,  NULL,           Meta_conductor },
+        { "director",         required_argument,  NULL,           Meta_director },
+        { "originalArtist",   required_argument,  NULL,           Meta_originalArtist },
+        { "producer",         required_argument,  NULL,           Meta_producer },
+//        { "performer",        required_argument,  NULL,           Meta_performer },
+        { "soundEngineer",    required_argument,  NULL,           Meta_soundEngineer },
+        { "soloist",          required_argument,  NULL,           Meta_soloist },
+        { "executiveProducer",required_argument,  NULL,           Meta_executiveProducer },
         { "title",            required_argument,  NULL,           Meta_songtitle },
+        { "subtitle",         required_argument,  NULL,           Meta_subtitle },
         { "album",            required_argument,  NULL,           Meta_album },
         { "genre",            required_argument,  NULL,           Meta_genre },
         { "tracknum",         required_argument,  NULL,           Meta_tracknum },
@@ -1028,6 +1079,7 @@ int real_main(int argc, char *argv[])
         { "comment",          required_argument,  NULL,           Meta_comment },
         { "year",             required_argument,  NULL,           Meta_year },
         { "lyrics",           required_argument,  NULL,           Meta_lyrics },
+        { "lyricsFile",       required_argument,  NULL,           Meta_lyrics_file },
         { "composer",         required_argument,  NULL,           Meta_composer },
         { "copyright",        required_argument,  NULL,           Meta_copyright },
         { "grouping",         required_argument,  NULL,           Meta_grouping },
@@ -1040,6 +1092,7 @@ int real_main(int argc, char *argv[])
         { "stik",             required_argument,  NULL,           Meta_stik },
         { "description",      required_argument,  NULL,           Meta_description },
         { "longdesc",         required_argument,  NULL,           Meta_longdescription },
+        { "storedesc",        required_argument,  NULL,           Meta_storedescription },
         { "Rating",           required_argument,  NULL,           Meta_Rating },
         { "TVNetwork",        required_argument,  NULL,           Meta_TV_Network },
         { "TVShowName",       required_argument,  NULL,           Meta_TV_ShowName },
@@ -1056,6 +1109,7 @@ int real_main(int argc, char *argv[])
         { "encodedBy",        required_argument,  NULL,           Meta_EncodedBy },
         { "apID",             required_argument,  NULL,           Meta_apID },
         { "cnID",             required_argument,  NULL,           Meta_cnID },
+        { "geID",             required_argument,  NULL,           Meta_geID },
         { "xID",              required_argument,  NULL,           Meta_xID },
         { "gapless",          required_argument,  NULL,           Meta_PlayGapless },
         { "sortOrder",        required_argument,  NULL,           Meta_SortOrder } ,
@@ -1182,7 +1236,7 @@ int real_main(int argc, char *argv[])
                 }
             }
             APar_OpenISOBaseMediaFile(ISObasemediafile, false);
-            APar_FreeMemory();
+            // APar_FreeMemory();		// is commented in 0.9.7 not sure???
             break;
         }
 
@@ -1217,7 +1271,152 @@ int real_main(int argc, char *argv[])
                 APar_assert(false, 4, &*major_brand);
                 break;
             }
-            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.\251ART.data", optarg, AtomFlags_Data_Text);
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)ART.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_artDirector : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "artDirector") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)ard.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_arranger : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "arranger") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)arg.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_author : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "author") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)aut.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_conductor : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "conductor") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)con.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_director : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "director") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)dir.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_originalArtist : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "originalArtist") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)ope.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_producer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "producer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)prd.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+/*
+        case Meta_performer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "performer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)prf.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+*/
+
+        case Meta_soundEngineer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "soundEngineer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)sne.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_soloist : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "soloist") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)sol.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_executiveProducer : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "executiveProducer") ) {
+                char major_brand[4];
+                UInt32_TO_String4(brand, &*major_brand);
+                APar_assert(false, 4, &*major_brand);
+                break;
+            }
+            AtomicInfo* artistData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)xpd.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(artistData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
             break;
         }
@@ -1228,7 +1427,18 @@ int real_main(int argc, char *argv[])
                 break;
             }
 
-            AtomicInfo* titleData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.\251nam.data", optarg, AtomFlags_Data_Text);
+            AtomicInfo* titleData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)nam.data", optarg, AtomFlags_Data_Text);
+            APar_Unified_atom_Put(titleData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
+            break;
+        }
+
+        case Meta_subtitle : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "subtitle") ) {
+                break;
+            }
+
+            AtomicInfo* titleData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.(c)st3.data", optarg, AtomFlags_Data_Text);
             APar_Unified_atom_Put(titleData_atom, optarg, UTF8_iTunesStyle_256glyphLimited, 0, 0);
             break;
         }
@@ -1343,6 +1553,16 @@ int real_main(int argc, char *argv[])
             break;
         }
 
+        case Meta_lyrics_file : {
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "lyrics") ) {
+                break;
+            }
+
+            APar_MetaData_atomLyrics_Set(optarg);
+            break;
+        }
+
         case Meta_composer : {
             APar_ScanAtoms(ISObasemediafile);
             if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "composer") ) {
@@ -1398,14 +1618,12 @@ int real_main(int argc, char *argv[])
                 break;
             }
             
-            if (strcmp(optarg, "0") == 0 || strlen(optarg) == 0) {
+            if (strcmp(optarg, "false") == 0 || strlen(optarg) == 0) {
                 APar_RemoveAtom("moov.udta.meta.ilst.hdvd.data", VERSIONED_ATOM, 0);
             } else {
-                uint8_t hdvideo_value = 0;
-                sscanf(optarg, "%" SCNu8, &hdvideo_value );
                 //compilation: [0, 0, 0, 0,   boolean_value]; BUT that first uint32_t is already accounted for in APar_MetaData_atom_Init
                 AtomicInfo* hdvideoData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.hdvd.data", optarg, AtomFlags_Data_UInt);
-                APar_Unified_atom_Put(hdvideoData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, hdvideo_value, 8);
+                APar_Unified_atom_Put(hdvideoData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, 1, 8); //a hard coded uint8_t of: 1 is compilation
             }
             break;
         }
@@ -1475,7 +1693,7 @@ int real_main(int argc, char *argv[])
                 if (strncmp(optarg, "value=", 6) == 0) {
                     char* stik_val_str_ptr = optarg;
                     strsep(&stik_val_str_ptr,"=");
-                    sscanf(stik_val_str_ptr, "%" PRIu8 "", &stik_value);
+                    stik_value = strtoul(stik_val_str_ptr, NULL, 10);
                 } else {
                     stiks* return_stik = MatchStikString(optarg);
                     if (return_stik != NULL) {
@@ -1634,6 +1852,20 @@ int real_main(int argc, char *argv[])
 
             AtomicInfo* cnIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.cnID.data", optarg, AtomFlags_Data_UInt);
             APar_Unified_atom_Put(cnIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
+            break;
+        }
+
+        case Meta_geID : { // the iTunes Genre ID
+            APar_ScanAtoms(ISObasemediafile);
+            if ( !APar_assert(metadata_style == ITUNES_STYLE, 1, "iTunes Genre ID") ) {
+                break;
+            }
+
+            uint32_t data_value = 0;
+            sscanf(optarg, "%" SCNu32, &data_value );
+
+            AtomicInfo* geIDData_atom = APar_MetaData_atom_Init("moov.udta.meta.ilst.geID.data", optarg, AtomFlags_Data_UInt);
+            APar_Unified_atom_Put(geIDData_atom, NULL, UTF8_iTunesStyle_256glyphLimited, data_value, 32);
             break;
         }
 
@@ -1828,7 +2060,7 @@ int real_main(int argc, char *argv[])
         case Meta_uuid : {
             APar_ScanAtoms(ISObasemediafile);
             uint32_t uuid_dataType = 0;
-            size_t desc_len = 0;
+            uint64_t desc_len = 0;
             uint8_t mime_len = 0;
             char* uuid_file_path = NULL;
             char* uuid_file_description = NULL;
@@ -1846,7 +2078,7 @@ int real_main(int argc, char *argv[])
             // they match, it will print out or extract to a file; if not, only
             // its name will be displayed in the tree.
             //
-            // --meta-uuid "�foo" 1 'http://www.url.org'  --meta-uuid "pdf1"
+            // --meta-uuid "(c)foo" 1 'http://www.url.org'  --meta-uuid "pdf1"
             // file /some/path/pic.pdf description="My Booty, Your Booty,
             // Djbouti"
 
@@ -1936,7 +2168,7 @@ int real_main(int argc, char *argv[])
                 FILE* uuid_binfile = APar_OpenFile(uuid_file_path, "rb");
                 APar_Unified_atom_Put(genericUUID, NULL, UTF8_3GP_Style, file_len, 32);
                 //store the data directly on the atom in AtomicData
-                uint32_t bin_bytes_read = (uint32_t)APar_ReadFile(genericUUID->AtomicData + (genericUUID->AtomicLength - 32), uuid_binfile, file_len);
+                uint64_t bin_bytes_read = APar_ReadFile(genericUUID->AtomicData + (genericUUID->AtomicLength - 32), uuid_binfile, file_len);
                 genericUUID->AtomicLength += bin_bytes_read;
                 fclose(uuid_binfile);
 
@@ -2278,7 +2510,7 @@ int real_main(int argc, char *argv[])
                     if ( strncmp(argv[optind + i], "trknum=", 7) == 0 ) {
                         char* track_num = argv[optind + i];
                         strsep(&track_num,"=");
-                        sscanf(track_num, "%" PRIu8 "", &tracknum);
+                        tracknum = strtoul(track_num, NULL, 10);
                     }
                     if (*argv[optind + i] == '-') break;
                 }
@@ -2318,7 +2550,7 @@ int real_main(int argc, char *argv[])
                 if ( strncmp(argv[optind], "track=", 6) == 0 ) {
                     char* trak_idx = argv[optind];
                     strsep(&trak_idx, "=");
-                    sscanf(trak_idx, "%" PRIu8 "", &selected_track);
+                    selected_track = strtoul(trak_idx, NULL, 10);
                     userdata_area = SINGLE_TRACK_ATOM;
                 } else if ( strcmp(argv[optind], "track") == 0 ) {
                     userdata_area = ALL_TRACKS_ATOM;
@@ -2624,7 +2856,7 @@ int real_main(int argc, char *argv[])
                     } else if ( strncmp(argv[optind + i], "domain=", 7) == 0 ) {
                         reverseDNS_atomdomain = argv[optind + i]+7;
                     } else if ( strncmp(argv[optind + i], "datatype=", 9) == 0 ) {
-                        sscanf(argv[optind + i]+9, "%u", &rdns_atom_flags);
+                        sscanf(argv[optind + i]+9, "%" SCNu32, &rdns_atom_flags);
                     }
                     if (*argv[optind + i] == '-') {
                         break; //we've hit another cli argument
@@ -2733,7 +2965,7 @@ int real_main(int argc, char *argv[])
 
                 const char* groupsymbol = find_ID3_optarg(argv, optind, "groupsymbol=");
                 if (groupsymbol[0] == '0' && groupsymbol[1] == 'x') {
-                    sscanf(groupsymbol, "%hhX", &id3args->groupSymbol);
+                    id3args->groupSymbol = strtoul(groupsymbol, NULL, 16);
                     if (id3args->groupSymbol < 0x80 || id3args->groupSymbol > 0xF0) id3args->groupSymbol = 0;
                 }
             }

@@ -212,6 +212,7 @@ void APar_MetaData_atomArtwork_Set(const char* artworkPath,
   char* env_PicOptions);
 
 void APar_MetaData_atomGenre_Set(const char* atomPayload);
+void APar_MetaData_atomLyrics_Set(const char* lyricsPath);
 void APar_MetaData_atom_QuickInit(short atom_num, const uint32_t atomFlags,
   uint64_t supplemental_length, uint64_t allotment = MAXDATA_PAYLOAD + 1);
 
@@ -393,6 +394,8 @@ bool MatchLanguageCode(const char* in_code);
 void ListLanguageCodes();
 
 void ListMediaRatings();
+void ListTVGenreIDValues();
+void ListMovieGenreIDValues();
 const char* Expand_cli_mediastring(const char* cli_rating);
 
 char* ID3GenreIntToString(int genre);

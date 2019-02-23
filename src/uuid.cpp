@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - APar_uuid.cpp
+    AtomicParsley - uuid.cpp
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright �2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
                                                                    */
 //==================================================================//
@@ -110,7 +110,7 @@ APar_print_uuid
 		Print out a full string representation of a uuid
 ----------------------*/
 void APar_print_uuid(ap_uuid_t* uuid, bool new_line) {
-	fprintf(stdout, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+	fprintf(stdout, "%08" PRIx32 "-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 									uuid->time_low,
 									uuid->time_mid,
 									uuid->time_hi_and_version,
@@ -129,7 +129,7 @@ APar_sprintf_uuid
 		Put a binary representation of a uuid to a human-readable ordered uuid string
 ----------------------*/
 void APar_sprintf_uuid(ap_uuid_t* uuid, char* destination) {
-	sprintf(destination, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+	sprintf(destination, "%08" PRIx32 "-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 									uuid->time_low,
 									uuid->time_mid,
 									uuid->time_hi_and_version,

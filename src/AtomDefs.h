@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_AtomDefinitions.h
+    AtomicParsley - AtomDefs.h
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General
@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2006-2007 puck_lock
+    Copyright (c)2006-2007 puck_lock
     with contributions from others; see the CREDITS file
 																																		*/
 //==================================================================//
@@ -248,11 +248,11 @@ atomDefinition KnownAtoms[] = {
 
 	//{"chpl",	{"udta"},						CHILD_ATOM,				OPTIONAL_ONCE,				VERSIONED_ATOM },		//Nero - seems to be versioned
 	//{"ndrm",	{"udta"},						CHILD_ATOM,				OPTIONAL_ONCE,				VERSIONED_ATOM },		//Nero - seems to be versioned
-	//{"tags",	{"udta"},						CHILD_ATOM,				OPTIONAL_ONCE,				SIMPLE_ATOM },			//Another Nero-Creationª
+	//{"tags",	{"udta"},						CHILD_ATOM,				OPTIONAL_ONCE,				SIMPLE_ATOM },			//Another Nero-Creation
 																																															// ...so if they claim that "tags doesn't have any children",
 																																															// why does nerotags.exe say "tshd atom"? If 'tags' doesn't
 																																															// have any children, then tshd can't be an atom....
-																																															// Clearly, they are EternallyRightª and everyone else is
+																																															// Clearly, they are EternallyRight and everyone else is
 																																															// always wrong.
 																																															
 																																															//Pish! Seems that Nero is simply unable to register any atoms.

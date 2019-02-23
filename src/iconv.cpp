@@ -1,6 +1,6 @@
 //==================================================================//
 /*
-    AtomicParsley - AP_iconv.cpp
+    AtomicParsley - iconv.cpp
 
     AtomicParsley is GPL software; you can freely distribute, 
     redistribute, modify & use under the terms of the GNU General
@@ -787,7 +787,7 @@ utf8_length
 size_t utf8_length(const char *in_string, size_t char_limit) {
 	const char *utf8_str = in_string;
 	unsigned int utf8_string_length = 0;
-	unsigned int in_str_len = (int)strlen(in_string);
+	unsigned int in_str_len = (unsigned int)strlen(in_string);
 	unsigned int byte_count = 0;
 	unsigned int bytes_in_char = 0;
 
